@@ -1,7 +1,6 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from './store/auth'
 
-const debugPayload: any = {}
 const API_BASE = import.meta.env.VITE_API_BASE as string || 'http://localhost:8000'
 
 const api = axios.create({

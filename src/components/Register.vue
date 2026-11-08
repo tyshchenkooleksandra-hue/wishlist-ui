@@ -51,6 +51,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../store/auth'
 import { useRouter } from 'vue-router'
+import { apiErrorDetail } from '../api'
 
 const email = ref<string>('')
 const fullName = ref<string>('')
@@ -65,7 +66,7 @@ async function onSubmit(): Promise<void> {
   error.value = null
   message.value = null
   try {
-    const payload: any = {
+    const payload: { email: string; password: string; full_name?: string } = {
       email: email.value,
       password: password.value
     }
@@ -78,8 +79,8 @@ async function onSubmit(): Promise<void> {
     await auth.register(payload)
     message.value = 'Registered successfully. Please login.'
     setTimeout(() => router.push('/login'), 900)
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Registration failed'
+  } catch (e) {
+    error.value = apiErrorDetail(e, 'Registration failed')
   }
 }
 </script>

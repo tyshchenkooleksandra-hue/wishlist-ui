@@ -15,4 +15,9 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config
 })
 
+// Текст помилки від API (поле detail) або запасне повідомлення, без `any` у кожному catch.
+export function apiErrorDetail(e: unknown, fallback: string): string {
+  return (axios.isAxiosError(e) && e.response?.data?.detail) || fallback
+}
+
 export default api

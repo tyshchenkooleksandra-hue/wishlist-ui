@@ -1,0 +1,24 @@
+name: Nightly dependency audit
+
+# Лише за розкладом і вручну. Тригера pull_request немає навмисно: це перевірка стану main,
+# а не чиєїсь зміни, тому вона не з'являється в перевірках PR і не блокує злиття.
+on:
+  schedule:
+    - cron: "0 3 * * *"  # щоночі о 03:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  npm-audit:
+    name: Audit dependencies (npm audit)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24"
+      - name: Run npm audit
+        # Встановлення не потрібне: npm audit читає package-lock.json.
+        run: npm audit --audit-level=high

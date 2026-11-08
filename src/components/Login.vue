@@ -39,6 +39,7 @@
 import { ref } from 'vue'
 import { useAuthStore } from '../store/auth'
 import { useRouter } from 'vue-router'
+import { apiErrorDetail } from '../api'
 
 const email = ref<string>('')
 const password = ref<string>('')
@@ -52,8 +53,8 @@ async function onSubmit(): Promise<void> {
   try {
     await auth.login(email.value, password.value)
     router.push('/my-wishlists')
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Login failed'
+  } catch (e) {
+    error.value = apiErrorDetail(e, 'Login failed')
   }
 }
 </script>

@@ -1,0 +1,65 @@
+name: CI
+
+# Лише pull request і push у main: не на кожну подію підряд.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  # Найдешевша перевірка — найраніше.
+  lint:
+    name: Lint (eslint)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+      # npm ci ставить рівно те, що в package-lock.json, і падає, якщо файли розійшлися.
+      - name: Install dependencies
+        run: npm ci
+      - name: Run eslint
+        run: npm run lint
+
+  types:
+    name: Types (vue-tsc)
+    needs: lint
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Check types
+        run: npx vue-tsc -b
+
+  build:
+    name: Build (vite)
+    needs: types
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: dist
+          path: dist/
+          retention-days: 14
+          if-no-files-found: error

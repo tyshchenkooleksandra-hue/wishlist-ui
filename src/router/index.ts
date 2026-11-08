@@ -30,7 +30,7 @@ router.beforeEach(async (to, _from, next) => {
   if (!auth.user && auth.token) {
     try {
       await auth.fetchUser()
-    } catch (e) {
+    } catch {
       auth.logout()
     }
   }

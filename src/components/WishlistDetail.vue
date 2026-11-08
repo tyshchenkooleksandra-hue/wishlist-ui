@@ -120,7 +120,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import api from '../api'
+import api, { apiErrorDetail } from '../api'
 import { Check, X, Clock } from 'lucide-vue-next'
 
 interface Item {
@@ -128,6 +128,14 @@ interface Item {
   title: string
   url?: string
   marked: boolean
+}
+
+// Елемент у відповіді API: is_marked і description, а не marked і url
+interface ApiItem {
+  id: number
+  title: string
+  description?: string
+  is_marked: boolean
 }
 
 interface Status {
@@ -176,7 +184,7 @@ async function fetchWishlist() {
 async function fetchItems() {
   try {
     const res = await api.get(`/wishlists/${route.params.id}/items`)
-    items.value = res.data.map((i: any) => ({
+    items.value = res.data.map((i: ApiItem) => ({
       ...i,
       marked: i.is_marked,
       url: i.description
@@ -197,8 +205,8 @@ async function addItem() {
     items.value.push(res.data)
     newItem.value.title = ''
     newItem.value.url = ''
-  } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Add item failed'
+  } catch (e) {
+    error.value = apiErrorDetail(e, 'Add item failed')
   }
 }
 async function deleteItem(item: Item) {
